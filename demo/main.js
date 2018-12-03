@@ -1,5 +1,14 @@
 let canvas = null;
 let ctx = null;
+let strokes = [];
+
+function getPoint(e) {
+    let rect = canvas.getBoundingClientRect();
+    return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+    };
+}
 
 async function main() {
     // Wait for canvas to exist
@@ -7,29 +16,67 @@ async function main() {
         await customElements.whenDefined("stylus-canvas");
     }
 
+
     // Get the canvas
     canvas = document.querySelector("stylus-canvas");
     ctx = canvas.getContext("2d", {lowLatency: true});
-    drawStrokes();
-    canvas.addEventListener("resize", drawStrokes);
-    canvas.addEventListener("rotate", e => {
-        // Reset transform
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-        // Rotate & redraw
-        const angle = e.detail.angle;
-        console.log(angle);
-        // ctx.rotate(-angle * Math.PI / 180);
-        drawStrokes();
-    })
+    let strokes = [];
+    let isDrawing = false;
+
+    // Set up resize/rotate handlers
+    canvas.addEventListener("resize", () => drawAllStrokes(strokes));
+    canvas.addEventListener("rotate", e => {
+        canvas.updateTransform2d(ctx);
+        drawAllStrokes(strokes);
+    });
+
+    canvas.addEventListener("pointerdown", (e) => {
+        const p = getPoint(e);
+        strokes.push([p]);
+        isDrawing = true;
+    });
+    canvas.addEventListener("pointermove", (e) => {
+        if(isDrawing) {
+            const p = getPoint(e);
+            strokes[strokes.length-1].push(p);
+            drawLatestStrokePortion(strokes);
+        }
+    });
+    canvas.addEventListener("pointerup", () => {
+        isDrawing = false;
+    });
 }
 
 main();
 
-function drawStrokes() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+function drawLatestStrokePortion(strokes) {
     ctx.strokeStyle = "#000";
-    ctx.moveTo(0,0);
-    ctx.lineTo(100,100);
+    
+    let lastStroke = strokes[strokes.length-1];
+    let prev = lastStroke[lastStroke.length-2];
+    let p = lastStroke[lastStroke.length-1];
+    ctx.moveTo(prev.x, prev.y);
+    ctx.lineTo(p.x, p.y);
     ctx.stroke();
+}
+
+function drawAllStrokes(strokes) {
+    ctx.fillStyle = "red";
+    ctx.fillRect(0,0,600,400);
+
+    // Draw arrow
+    ctx.strokeStyle = "#000";
+    strokes.forEach(stroke => {
+        ctx.beginPath();
+        
+        let prev = stroke[0];
+        for(let i = 1; i < stroke.length; i++) {
+            let p = stroke[i];
+            ctx.moveTo(prev.x, prev.y);
+            ctx.lineTo(p.x, p.y);
+            ctx.stroke();
+            prev = p;
+        }
+    });
 }

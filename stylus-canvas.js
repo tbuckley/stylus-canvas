@@ -8,6 +8,10 @@ let tmpl = document.createElement('template');
 tmpl.innerHTML = `
   <style>
     :host {display: block;}
+    canvas {
+        touch-action: none;
+        transform-origin: 50% 50%;
+    }
   </style>
   <canvas></canvas>
 `;
@@ -19,6 +23,7 @@ class StylusCanvas extends HTMLElement {
         // Initialize properties
         this._lowLatencyEnabled = true;
         this._rotation = 0;
+        this._dimensions = {width: this.offsetWidth, height: this.offsetHeight};
 
         // Create shadow root
         let shadowRoot = this.attachShadow({mode: "open"});
@@ -31,10 +36,8 @@ class StylusCanvas extends HTMLElement {
                 const cr = entry.contentRect;
                 const target = entry.target;
 
-                this.canvas.width = cr.width;
-                this.canvas.height = cr.height;
-                this.canvas.style.width = `${cr.width}px`;
-                this.canvas.style.height = `${cr.height}px`;
+                this._dimensions = {width: cr.width, height: cr.height};
+                this._updateCanvasSize();
                 this.dispatchEvent(new CustomEvent("resize", {
                     width: cr.width,
                     height: cr.height,
@@ -57,15 +60,45 @@ class StylusCanvas extends HTMLElement {
 
         this._rotation = screen.orientation.angle;
         this._updateTransform();
+        this._updateCanvasSize();
         this.dispatchEvent(new CustomEvent("rotate", {detail: {angle: this._rotation}}));
     }
     _updateTransform() {
+        console.log("_updateTransform");
         let rotation = this._rotation;
         if(!this._lowLatencyEnabled) {
             // TODO Use more reliable method to disable low latency
             rotation += ROTATION_EPSILON;
         }
-        this.canvas.style.transform = `rotate(${rotation}deg)`;
+
+        let shiftX = 0, shiftY = 0;
+        if(this._rotation == 90 || this._rotation == 270) {
+            let [width, height] = this._getCanvasWidthHeight();
+            let w2 = width/2;
+            let h2 = height/2;
+            shiftX = h2-w2;
+            shiftY = w2-h2;
+        }
+
+        let translateTransform = `translate(${shiftX}px, ${shiftY}px)`;
+        let rotationTransform = `rotate(${rotation}deg)`;
+        this.canvas.style.transform = translateTransform + " " + rotationTransform;
+    }
+    _getCanvasWidthHeight() {
+        let width = this._dimensions.width;
+        let height = this._dimensions.height;
+        if(this._rotation == 0 || this._rotation == 180) {
+            return [width, height];
+        }
+        return [height, width];
+    }
+    _updateCanvasSize() {
+        let [width, height] = this._getCanvasWidthHeight();
+
+        this.canvas.width = width;
+        this.canvas.height = height;
+        this.canvas.style.width = `${width}px`;
+        this.canvas.style.height = `${height}px`;
     }
 
     // API
@@ -92,6 +125,24 @@ class StylusCanvas extends HTMLElement {
 
         this._lowLatencyEnabled = enabled;
         this._updateTransform();
+    }
+
+    updateTransform2d(ctx) {
+        // Reset transform
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        
+        // Move origin based on rotation
+        let [width, height] = this._getCanvasWidthHeight();
+        switch(this._rotation) {
+            case 0: break;
+            case 180: ctx.translate(width,height); break;
+            case 90: ctx.translate(0,height); break;
+            case 270: ctx.translate(width,0); break;
+        }
+
+        // Rotate context
+        const angleRadians = this._rotation * Math.PI / 180;
+        ctx.rotate(-angleRadians);
     }
 }
 
