@@ -42,17 +42,16 @@ export default class StylusCanvas extends HTMLElement {
 
     // Observe resizes
     this.resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
+      entries.forEeach((entry) => {
         const cr = entry.contentRect;
-        const target = entry.target;
 
         this.dimensions = { width: cr.width, height: cr.height };
-        this._updateCanvasSize();
+        this.updateCanvasSize();
         this.dispatchEvent(new CustomEvent('resize', {
           width: cr.width,
           height: cr.height,
         }));
-      }
+      });
     });
     this.resizeObserver.observe(this);
 
@@ -96,7 +95,7 @@ export default class StylusCanvas extends HTMLElement {
     this.canvas.style.transform = `${translateTransform} ${rotationTransform}`;
   }
 
-  _updateCanvasSize() {
+  updateCanvasSize() {
     const [width, height] = getCanvasWidthHeight(this.dimensions, this.rotation);
 
     this.canvas.width = width;
