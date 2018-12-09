@@ -58,14 +58,14 @@ export default class StylusCanvas extends LitElement {
     // Initialize properties
     this.width = 300; // <canvas> default
     this.height = 150; // <canvas> default
-    this.rotation = 0;
+    this.rotation = window.screen.orientation.angle;
     this.disableLowLatency = false;
 
     // Observe resizes
-    this.resizeObserver = new ResizeObserver((entries) => {
-      entries.forEeach((entry) => {
-        const cr = entry.contentRect;
-        this.handleResize(cr);
+    this.resizeObserver = new ResizeObserver(() => {
+      this.handleResize({
+        width: this.clientWidth,
+        height: this.clientHeight,
       });
     });
     this.resizeObserver.observe(this);
@@ -74,15 +74,19 @@ export default class StylusCanvas extends LitElement {
     window.screen.orientation.onchange = () => {
       this.handleRotate(window.screen.orientation.angle);
     };
-    this.handleRotate(window.screen.orientation.angle);
   }
 
-  render(props) {
-    const { width, height, rotation } = props;
-    const [canvasWidth, canvasHeight] = rotateDimensions([width, height], rotation);
+  render() {
+    const { width, height, rotation } = this;
+    const canvasDims = rotateDimensions({ width, height }, rotation);
+    const elDims = { width: this.clientWidth, height: this.clientHeight };
+    const canvasStyleDims = rotateDimensions(elDims, rotation);
 
-    const transform = getTransform(props);
-    const style = `width: ${this.offsetWidth}px; height: ${this.offsetHeight}px; ${transform}`;
+    const { disableLowLatency } = this;
+    const transform = getTransform({
+      ...elDims, rotation, disableLowLatency,
+    });
+    const style = `width: ${canvasStyleDims.width}px; height: ${canvasStyleDims.height}px; ${transform}`;
 
     return html`
       <style>
@@ -92,32 +96,26 @@ export default class StylusCanvas extends LitElement {
         transform-origin: 50% 50%;
       }
       </style>
-      <canvas width=${canvasWidth} height=${canvasHeight} style=${style}></canvas>
+      <canvas width=${canvasDims.width} height=${canvasDims.height} style=${style}></canvas>
     `;
   }
 
-  handleResize({ width, height }) {
+  async handleResize({ width, height }) {
     this.requestUpdate();
-    this.updateComplete.then(() => {
-      this.dispatchEvent(new CustomEvent('canvas-resize', {
-        detail: { width, height },
-      }));
-    });
+    await this.updateComplete;
+    this.dispatchEvent(new CustomEvent('canvas-resize', {
+      detail: { width, height },
+    }));
   }
 
-  handleRotate(rotation) {
-    if (this.rotation === rotation) {
-      return;
-    }
-
+  async handleRotate(rotation) {
     this.rotation = rotation;
-    this.updateComplete.then(() => {
-      this.dispatchEvent(new CustomEvent('canvas-rotate', {
-        detail: {
-          angle: this.rotation,
-        },
-      }));
-    });
+    await this.updateComplete;
+    this.dispatchEvent(new CustomEvent('canvas-rotate', {
+      detail: {
+        angle: this.rotation,
+      },
+    }));
   }
 
   // API

@@ -1,5 +1,8 @@
 /* eslint-env browser */
 
+import '../src/stylus-canvas';
+import updateTransform from '../src/2d/updateTransform';
+
 let canvas = null;
 let ctx = null;
 const STROKES = [];
@@ -13,6 +16,7 @@ function getPoint(e) {
 }
 
 function drawLatestStrokePortion(strokes) {
+  ctx.lineWidth = 0.5;
   ctx.strokeStyle = '#000';
 
   const lastStroke = strokes[strokes.length - 1];
@@ -24,11 +28,9 @@ function drawLatestStrokePortion(strokes) {
 }
 
 function drawAllStrokes(strokes) {
-  ctx.fillStyle = 'red';
-  ctx.fillRect(0, 0, 600, 400);
-
-  // Draw arrow
+  ctx.lineWidth = 0.5;
   ctx.strokeStyle = '#000';
+
   strokes.forEach((stroke) => {
     ctx.beginPath();
 
@@ -43,17 +45,37 @@ function drawAllStrokes(strokes) {
   });
 }
 
-function main() {
+async function main() {
   // Get the canvas
   canvas = document.querySelector('stylus-canvas');
+
+  await canvas.updateComplete;
   ctx = canvas.getContext('2d', { lowLatency: true });
+
+  const ratio = window.devicePixelRatio;
+  canvas.width = canvas.clientWidth * ratio;
+  canvas.height = canvas.clientHeight * ratio;
+
+  await canvas.updateComplete;
+  updateTransform(ctx, canvas);
+  ctx.scale(ratio, ratio);
+  drawAllStrokes(STROKES);
 
   let isDrawing = false;
 
   // Set up resize/rotate handlers
-  canvas.addEventListener('resize', () => drawAllStrokes(STROKES));
-  canvas.addEventListener('rotate', (e) => {
-    canvas.updateTransform2d(ctx);
+  canvas.addEventListener('canvas-resize', async (e) => {
+    canvas.width = e.detail.width * ratio;
+    canvas.height = e.detail.height * ratio;
+    await canvas.updateComplete;
+    updateTransform(ctx, canvas);
+    ctx.scale(ratio, ratio);
+
+    drawAllStrokes(STROKES);
+  });
+  canvas.addEventListener('canvas-rotate', () => {
+    updateTransform(ctx, canvas);
+    ctx.scale(ratio, ratio);
     drawAllStrokes(STROKES);
   });
 
@@ -74,12 +96,4 @@ function main() {
   });
 }
 
-async function init() {
-  // Wait for canvas to exist
-  if (!customElements.get('stylus-canvas')) {
-    await customElements.whenDefined('stylus-canvas');
-  }
-  main();
-}
-
-init();
+main();
