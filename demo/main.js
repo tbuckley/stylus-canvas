@@ -27,7 +27,15 @@ function drawLatestStrokePortion(strokes) {
   ctx.stroke();
 }
 
+function clearCanvas() {
+  ctx.fillStyle = '#FFF';
+  const cr = canvas.getBoundingClientRect();
+  ctx.fillRect(0, 0, cr.width, cr.height);
+}
+
 function drawAllStrokes(strokes) {
+  clearCanvas();
+
   ctx.lineWidth = 0.5;
   ctx.strokeStyle = '#000';
 
@@ -44,13 +52,15 @@ function drawAllStrokes(strokes) {
     }
   });
 }
-
 async function main() {
   // Get the canvas
   canvas = document.querySelector('stylus-canvas');
 
   await canvas.updateComplete;
-  ctx = canvas.getContext('2d', { lowLatency: true });
+  ctx = canvas.getContext('2d', {
+    lowLatency: true,
+    alpha: false,
+  });
 
   const ratio = window.devicePixelRatio;
   canvas.width = canvas.clientWidth * ratio;
@@ -86,8 +96,8 @@ async function main() {
   });
   canvas.addEventListener('pointermove', (e) => {
     if (isDrawing) {
-      e.getCoalescedEvents().forEach((e) => {
-        const p = getPoint(e);
+      e.getCoalescedEvents().forEach((ce) => {
+        const p = getPoint(ce);
         STROKES[STROKES.length - 1].push(p);
         drawLatestStrokePortion(STROKES);
       });

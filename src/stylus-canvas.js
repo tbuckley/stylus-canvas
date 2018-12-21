@@ -84,38 +84,55 @@ export default class StylusCanvas extends LitElement {
 
     const { disableLowLatency } = this;
     const transform = getTransform({
-      ...elDims, rotation, disableLowLatency,
+      ...elDims,
+      rotation,
+      disableLowLatency,
     });
     const style = `width: ${canvasStyleDims.width}px; height: ${canvasStyleDims.height}px; ${transform}`;
 
     return html`
       <style>
-      :host {display: block;}
-      canvas {
-        touch-action: none;
-        transform-origin: 50% 50%;
-      }
+        :host {
+          display: block;
+          /*
+          Necessary to prevent layout issues on 90/180deg. Layout will
+          look at the pre-rotated dimensions.
+          */
+          overflow: hidden;
+        }
+        canvas {
+          touch-action: none;
+          transform-origin: 50% 50%;
+        }
       </style>
-      <canvas width=${canvasDims.width} height=${canvasDims.height} style=${style}></canvas>
+      <canvas
+        width="${canvasDims.width}"
+        height="${canvasDims.height}"
+        style="${style}"
+      ></canvas>
     `;
   }
 
   async handleResize({ width, height }) {
     this.requestUpdate();
     await this.updateComplete;
-    this.dispatchEvent(new CustomEvent('canvas-resize', {
-      detail: { width, height },
-    }));
+    this.dispatchEvent(
+      new CustomEvent('canvas-resize', {
+        detail: { width, height },
+      }),
+    );
   }
 
   async handleRotate(rotation) {
     this.rotation = rotation;
     await this.updateComplete;
-    this.dispatchEvent(new CustomEvent('canvas-rotate', {
-      detail: {
-        angle: this.rotation,
-      },
-    }));
+    this.dispatchEvent(
+      new CustomEvent('canvas-rotate', {
+        detail: {
+          angle: this.rotation,
+        },
+      }),
+    );
   }
 
   // API
