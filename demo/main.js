@@ -86,9 +86,11 @@ async function main() {
   });
   canvas.addEventListener('pointermove', (e) => {
     if (isDrawing) {
-      const p = getPoint(e);
-      STROKES[STROKES.length - 1].push(p);
-      drawLatestStrokePortion(STROKES);
+      e.getCoalescedEvents().forEach((e) => {
+        const p = getPoint(e);
+        STROKES[STROKES.length - 1].push(p);
+        drawLatestStrokePortion(STROKES);
+      });
     }
   });
   canvas.addEventListener('pointerup', () => {
