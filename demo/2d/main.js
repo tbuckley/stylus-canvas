@@ -1,9 +1,9 @@
 /* eslint-env browser */
 
-import '../src/stylus-canvas';
-import updateTransform from '../src/2d/updateTransform';
-import trackPointers from '../src/utils/trackPointers';
-import StrokeDrawer from '../src/utils/StrokeDrawer2d';
+import '../../src/stylus-canvas';
+import updateTransform from '../../src/2d/updateTransform';
+import trackPointers from '../../src/utils/trackPointers';
+import StrokeDrawer from '../../src/utils/StrokeDrawer2d';
 
 async function main() {
   // Get the canvas & wait for it to render

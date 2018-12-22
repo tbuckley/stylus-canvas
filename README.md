@@ -15,9 +15,11 @@ At this time (Nov 30), this is an experimental API in Chrome 71+. To use this in
 
 ## glDrawWithBackPressure
 
+    import drawWithBackPressure from "@tbuckley89/stylus-canvas/drawWithBackPressure";
+
     const ctx = document.querySelector("stylus-canvas").getContext("2d", {lowLatency: true});
     function draw() {
-        glDrawWithBackPressure(ctx, () => {
+        drawWithBackPressure(ctx, () => {
             // draw here
         });
         requestAnimationFrame(draw);
