@@ -3,7 +3,7 @@
 import '../src/stylus-canvas';
 import updateTransform from '../src/2d/updateTransform';
 import trackPointers from '../src/utils/trackPointers';
-import StrokeDrawer from '../src/2d/StrokeDrawer';
+import StrokeDrawer from '../src/utils/StrokeDrawer2d';
 
 async function main() {
   // Get the canvas & wait for it to render
@@ -54,6 +54,10 @@ async function main() {
     up: () => ({
       isDown: false,
     }),
+    cancel: (_, state) => {
+      drawer.removeStroke(state.strokeId);
+      return { isDown: false };
+    },
   }, () => ({ isDrawing: false }));
 }
 
