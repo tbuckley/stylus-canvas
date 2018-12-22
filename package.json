@@ -2,7 +2,7 @@
   "name": "stylus-canvas",
   "version": "1.0.0",
   "description": "",
-  "main": "stylus-canvas.js",
+  "main": "src/stylus-canvas.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
