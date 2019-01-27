@@ -63,10 +63,13 @@ export default class StylusCanvas extends LitElement {
 
     // Observe resizes
     this.resizeObserver = new ResizeObserver(() => {
-      this.handleResize({
-        width: this.clientWidth,
-        height: this.clientHeight,
-      });
+      // Only resize if still visible in the DOM
+      if (this.offsetParent !== null) {
+        this.handleResize({
+          width: this.clientWidth,
+          height: this.clientHeight,
+        });
+      }
     });
     this.resizeObserver.observe(this);
 
