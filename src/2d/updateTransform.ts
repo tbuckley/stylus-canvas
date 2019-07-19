@@ -1,14 +1,9 @@
-// TODO reuse rotateDimensions
-function rotateDimensions({ width, height }, rotation) {
-  if (rotation === 0 || rotation === 180) {
-    return { width, height };
-  }
-  return { width: height, height: width };
-}
+import { Dimensions, rotateDimensions } from '../utils/dimensions.js';
+import StylusCanvas from '..';
 
 // updateTransform will rotate/translate the context to account for
 // the rotation of the stylus canvas.
-export default function updateTransform(ctx, canvas) {
+export default function updateTransform(ctx: CanvasRenderingContext2D, canvas: StylusCanvas) {
   // Reset transform
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 

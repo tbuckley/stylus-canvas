@@ -1,23 +1,36 @@
+import StylusCanvas from "..";
+
 /* eslint-env browser */
 
-function drawSegment(ctx, start, end) {
+function drawSegment(ctx: CanvasRenderingContext2D, start: Point, end: Point) {
   ctx.moveTo(start.x, start.y);
   ctx.lineTo(end.x, end.y);
 }
 
-function strokeWithStyle(ctx) {
+function strokeWithStyle(ctx: CanvasRenderingContext2D) {
   ctx.lineWidth = 0.5;
   ctx.strokeStyle = '#000';
   ctx.stroke();
 }
 
-function drawFrame(ctx) {
+function drawFrame(ctx: CanvasRenderingContext2D) {
   strokeWithStyle(ctx);
   ctx.beginPath();
 }
 
+interface Point {
+  x: number;
+  y: number;
+}
+type Stroke = Point[];
+
 export default class StrokeDrawer2d {
-  constructor(canvas) {
+  strokes: Stroke[];
+  drawFrameRequested: boolean;
+  canvas: StylusCanvas;
+  ctx: CanvasRenderingContext2D;
+
+  constructor(canvas: StylusCanvas) {
     this.strokes = [];
     this.drawFrameRequested = false;
 
@@ -25,15 +38,15 @@ export default class StrokeDrawer2d {
     this.ctx = canvas.getContext('2d', {
       desynchronized: true,
       alpha: false,
-    });
+    }) as CanvasRenderingContext2D;
   }
 
-  startStroke(point) {
+  startStroke(point: Point): number {
     this.strokes.push([point]);
     return this.strokes.length - 1;
   }
 
-  addPoint(strokeId, point) {
+  addPoint(strokeId: number, point: Point) {
     const stroke = this.strokes[strokeId];
     const prev = stroke[stroke.length - 1];
     stroke.push(point);
@@ -41,7 +54,7 @@ export default class StrokeDrawer2d {
   }
 
   // SLOW! Requires full redraw
-  removeStroke(strokeId) {
+  removeStroke(strokeId: number) {
     this.strokes[strokeId] = [];
     this.clear();
     this.drawAll();
@@ -57,7 +70,7 @@ export default class StrokeDrawer2d {
     }
   }
 
-  drawSegment(start, end) {
+  drawSegment(start: Point, end: Point) {
     this.requestDrawFrame();
     const { ctx } = this;
     drawSegment(ctx, start, end);
