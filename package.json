@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@polymer/lit-element": "^0.6.3"
+    "lit-element": "^2.2.0"
   },
   "devDependencies": {
     "eslint": "^5.9.0",

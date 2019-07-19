@@ -1,7 +1,7 @@
 /* eslint-env browser */
 /* eslint class-methods-use-this: ["error", { "exceptMethods": ["render"] }] */
 
-import { LitElement, html } from '@polymer/lit-element';
+import { LitElement, html } from 'lit-element';
 
 // ROTATION_EPSILON is the amount to rotate the canvas when
 // disabling low latency. It should be large enough to cause
@@ -144,8 +144,8 @@ export default class StylusCanvas extends LitElement {
     const contextAttributes = optionalContextAttributes || {};
 
     // Check that parameters will allow for low-latency
-    if (contextAttributes.lowLatency !== true) {
-      throw new Error('getContext(id, attrs) must include {lowLatency: true}');
+    if (contextAttributes.desynchronized !== true) {
+      throw new Error('getContext(id, attrs) must include {desynchronized: true}');
     }
 
     const canvas = this.shadowRoot.querySelector('canvas');

@@ -23,7 +23,7 @@ export default class StrokeDrawer2d {
 
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d', {
-      lowLatency: true,
+      desynchronized: true,
       alpha: false,
     });
   }

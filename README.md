@@ -2,8 +2,6 @@
 
 This exposes the `<stylus-canvas>` web component, which allows for low-latency inking in browsers.
 
-At this time (Nov 30), this is an experimental API in Chrome 71+. To use this in your own web app, you must sign up for an original trial token or enable chrome://flags#enable-experimental-web-platform-features.
-
 # API
 
 * `getContext(id: string, attrs: object)` -- get a 2d or webgl context
@@ -17,7 +15,7 @@ At this time (Nov 30), this is an experimental API in Chrome 71+. To use this in
 
     import drawWithBackPressure from "@tbuckley89/stylus-canvas/drawWithBackPressure";
 
-    const ctx = document.querySelector("stylus-canvas").getContext("2d", {lowLatency: true});
+    const ctx = document.querySelector("stylus-canvas").getContext("2d", {desynchronized: true});
     function draw() {
         drawWithBackPressure(ctx, () => {
             // draw here
