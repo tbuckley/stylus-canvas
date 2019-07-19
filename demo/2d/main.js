@@ -1,9 +1,9 @@
 /* eslint-env browser */
 
-import '../../src/stylus-canvas';
-import updateTransform from '../../src/2d/updateTransform';
-import trackPointers from '../../src/utils/trackPointers';
-import StrokeDrawer from '../../src/utils/StrokeDrawer2d';
+import '../../pkg/dist-src/index';
+import updateTransform from '../../pkg/dist-src/2d/updateTransform';
+import trackPointers from '../../pkg/dist-src/utils/trackPointers';
+import StrokeDrawer from '../../pkg/dist-src/utils/StrokeDrawer2d';
 
 async function main() {
   // Get the canvas & wait for it to render
@@ -41,11 +41,11 @@ async function main() {
 
   // Handle input
   trackPointers(canvas, {
-    down: (p) => {
+    down: (_, p) => {
       const strokeId = drawer.startStroke(p);
       return { isDown: true, strokeId };
     },
-    move: (p, state) => {
+    move: (state, p) => {
       if (state.isDown) {
         drawer.addPoint(state.strokeId, p);
       }
@@ -54,11 +54,14 @@ async function main() {
     up: () => ({
       isDown: false,
     }),
-    cancel: (_, state) => {
+    cancel: (state, _) => {
       drawer.removeStroke(state.strokeId);
       return { isDown: false };
     },
-  }, () => ({ isDrawing: false }));
+  }, {
+    initState: () => ({ isDrawing: false }),
+    createPoint: (e) => ({x: e.clientX, y: e.clientY}),
+  });
 }
 
 main();
