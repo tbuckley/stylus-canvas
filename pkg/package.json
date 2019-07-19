@@ -1,12 +1,14 @@
 {
   "name": "stylus-canvas",
-  "description": "",
-  "version": "2.0.0",
+  "description": "This exposes the `<stylus-canvas>` web component, which allows for low-latency inking in browsers.",
+  "version": "2.0.1",
   "license": "ISC",
   "files": [
     "dist-*/",
     "bin/"
   ],
+  "esnext": "dist-src/index.js",
+  "module": "dist-web/index.js",
   "pika": true,
   "sideEffects": false,
   "keywords": [],
@@ -21,9 +23,6 @@
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
     "rollup": "^0.67.4",
-    "rollup-plugin-node-resolve": "^3.4.0",
-    "typescript": "^3.5.3"
-  },
-  "esnext": "dist-src/index.js",
-  "module": "dist-web/index.js"
+    "rollup-plugin-node-resolve": "^3.4.0"
+  }
 }
