@@ -1,4 +1,4 @@
-import { Dimensions, rotateDimensions } from '../utils/dimensions.js';
+import { rotateDimensions } from '../utils/dimensions.js';
 import StylusCanvas from '..';
 
 // updateTransform will rotate/translate the context to account for
