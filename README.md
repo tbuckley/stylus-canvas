@@ -4,22 +4,24 @@ This exposes the `<stylus-canvas>` web component, which allows for low-latency i
 
 # API
 
-* `getContext(id: string, attrs: object)` -- get a 2d or webgl context
+* `getContext(id: string, attrs: object)` -- get a 2d or webgl context; remember to pass `desynchronized: true`
 * `setLowLatency(enabled: boolean)` -- toggle low-latency. When updating large portions of the canvas, as when panning, tearing might occur when low-latency is enabled.
-* `resize` event -- fired when canvas has been resized
-* `rotate` event -- fired when canvas has been rotated to fit the 
+* `canvas-resize` event -- fired when canvas has been resized `{width: number, height: number}`
+* `canvas-rotate` event -- fired when canvas has been rotated to offset the display `{angle: number}`
 
 # Additional functions
 
 ## glDrawWithBackPressure
 
-    import drawWithBackPressure from "@tbuckley89/stylus-canvas/drawWithBackPressure";
+```js
+import drawWithBackPressure from "stylus-canvas/webgl/drawWithBackPressure";
 
-    const ctx = document.querySelector("stylus-canvas").getContext("2d", {desynchronized: true});
-    function draw() {
-        drawWithBackPressure(ctx, () => {
-            // draw here
-        });
-        requestAnimationFrame(draw);
-    }
+const gl = document.querySelector("stylus-canvas").getContext("2d", {desynchronized: true});
+function draw() {
+    drawWithBackPressure(gl, () => {
+        // draw here
+    });
     requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+```
